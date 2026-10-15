@@ -1,0 +1,158 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>หน่วยการเลือกตั้ง - สาธารณรัฐแห่งอาร์ลิงตัน</title>
+    <link rel="icon" href="" type="image/gif" sizes="16x16">
+    <link rel="stylesheet" href="https://slw-system.pages.dev/assets/css/font-face.css">
+    <link rel="stylesheet" href="/assets/css/index.css">
+    <style>
+        .loader-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 99999;
+            background: rgba(255,255,255,.88);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 14px;
+        }
+
+        .loader-spinner {
+            width: 42px;
+            height: 42px;
+            border: 4px solid #ddd;
+            border-top-color: #1769aa;
+            border-radius: 50%;
+            animation: spin .8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        #status-message {
+            margin: 12px 0;
+            font-weight: bold;
+        }
+
+        #status-message.error { color: #b00020; }
+        #status-message.success { font-family: 5em; color: #167a36; }
+    </style>
+</head>
+<body>
+    <!-- Loader overlay -->
+    <div id="loader">
+        <div id="loader-text">กำลังโหลดข้อมูล...</div>
+    </div>
+
+    <header>
+        <h3>คูหาเลือกตั้งสมาชิกสภาผู้แทนราษฎร</h3>
+        <div>
+            <p id="time"></p>
+        </div>
+    </header>
+
+    <div class="mt-5"></div>
+
+    <div>
+        <form class="flex" id="form" method="POST">
+            <div class="col-6 c-none">
+                <header>
+                    <h2>ตั้นขั้วบัตรเลือกตั้ง</h2>
+                </header>
+                <main>
+                    <div style="display: grid; text-align: left;width: 100%;">
+                        <label for="name">ชื่อ นามสกุล</label>
+                        <select id="name" name="name" required disabled>
+                            <option value="">-- กำลังโหลดรายชื่อ --</option>
+                        </select>
+                    </div>
+                </main>
+                <main>
+                    <button type="submit" id="submit-button" class="btn btn-primary button is-primary">หย่อนบัตร</button>
+                </main>
+                <main>
+                    <div id="status-message"></div>
+                </main>
+            </div>
+
+            <div class="col-6 c-6">
+                <header>
+                    <img src="" height="82.4px" alt="">
+                    <div>
+                        <h1>บัตรเลือกตั้งสภาผู้แทนราษฎร</h1>
+                        <p>ให้ลงลำดับผู้สมัครรับเลือกตั้ง เป็นเลขอารบิกไม่เกินจำนวนผู้สมัครในเขตนั้น</p>
+                    </div>
+                </header>
+                <div class="body-card">
+                    <div class="left-card">
+                        <div class="zone inline">
+                            <h3>เขตเลือกตั้งที่</h3>
+                            <div class="box-zone">
+                                <span>
+                                    <input type="text" id="number-zone" placeholder="" name="number-zone" required readonly>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="zone province">
+                            <h4>
+                                <span id="line1">ประกอบด้วย จังหวัด</span>
+                                <br>
+                                <span id="line2"></span>
+                            </h4>
+                        </div>
+                        <div class="zone instrctions-1">
+                            <h2>โปรดเขียนหมายเลขอารบิกของ<br>
+                                “ผู้สมัครสมาชิกสภาผู้แทนราษฎร”<br>
+                                ตามลำดับความต้องการ<br>
+                                ในช่องเขียนหมายเลขประจำตัวผู้สมัคร
+                            </h2>
+                        </div>
+                        <div class="zone instrctions-2">
+                            <h3>
+                                สามารถลงคะแนนเลือกตนเองได้<br>
+                                แต่จะลงคะแนนให้บุคคลใดเกินหนึ่งคะแนนมิได้
+                            </h3>
+                        </div>
+                        <div class="zone last">
+                            <h4>
+                                ถ้าไม่ประสงค์ลงคะแนนเลือกผู้ใด
+                                <br>
+                                “ไม่ต้องเขียนหมายเลขบนบัตรเลือกตั้ง”
+                            </h4>
+                        </div>
+                    </div>
+                    <div class="right-card">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <td colspan="2"><img src="/assets/img/sign.png" alt="sign"></td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- 1 to 10 -->
+                                <tr><td class="num">1</td><td class="input"><input type="text" class="value" id="vote1" name="vote1"></td></tr>
+                                <tr><td class="num">2</td><td class="input"><input type="text" class="value" id="vote2" name="vote2"></td></tr>
+                                <tr><td class="num">3</td><td class="input"><input type="text" class="value" id="vote3" name="vote3"></td></tr>
+                                <tr><td class="num">4</td><td class="input"><input type="text" class="value" id="vote4" name="vote4"></td></tr>
+                                <tr><td class="num">5</td><td class="input"><input type="text" class="value" id="vote5" name="vote5"></td></tr>
+                                <tr><td class="num">6</td><td class="input"><input type="text" class="value" id="vote6" name="vote6"></td></tr>
+                                <tr><td class="num">7</td><td class="input"><input type="text" class="value" id="vote7" name="vote7"></td></tr>
+                                <tr><td class="num">8</td><td class="input"><input type="text" class="value" id="vote8" name="vote8"></td></tr>
+                                <tr><td class="num">9</td><td class="input"><input type="text" class="value" id="vote9" name="vote9"></td></tr>
+                                <tr><td class="num">10</td><td class="input"><input type="text" class="value" id="vote10" name="vote10"></td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <script src="/assets/js/hr-election.js"></script>
+    
+</body>
+</html>
