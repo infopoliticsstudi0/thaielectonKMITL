@@ -539,7 +539,7 @@ select#name {
 .close, .not-open {
     padding-top: 50px;
     height: calc(100vh - 0px);
-    display: flex !important;
+    display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
