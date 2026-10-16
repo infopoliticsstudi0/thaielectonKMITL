@@ -535,3 +535,14 @@ select#name {
     height: 32px;
     
 }
+
+.close, .not-open {
+    padding-top: 50px;
+    height: calc(100vh - 0px);
+    display: flex !important;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background: red;
+    color: #fff;
+}
