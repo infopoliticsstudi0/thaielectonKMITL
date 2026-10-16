@@ -184,7 +184,7 @@
 
             if (now < electionStart) {
                 // ก่อนถึงเวลาเปิดคูหา
-                notOpen.style.display = "block";
+                notOpen.style.display = "flex";
 
             } else if (now <= electionEnd) {
                 // อยู่ในช่วงเวลาเลือกตั้ง
@@ -192,7 +192,7 @@
 
             } else {
                 // หลังหมดเวลาเลือกตั้ง
-                close.style.display = "block";
+                close.style.display = "flex";
             }
 
             // แสดงวันและเวลาปัจจุบันตามเวลาไทย
