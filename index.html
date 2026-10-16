@@ -56,9 +56,21 @@
         </div>
     </header>
 
+    <div class="not-open" id="not-open">
+        <h3>คูหาเลือกตั้งยังไม่เปิด</h3>
+        <p>ขณะนี้ <span id="day-not-open"></span></p>
+        <p><span id="time-not-open"></span></p>
+    </div>
+
+    <div class="close" id="close">
+        <h3>คูหาเลือกตั้งปิดแล้ว</h3>
+        <p>ขณะนี้ <span id="day-close"></span></p>
+        <p><span id="time-close"></span></p>
+    </div>
+
     <div class="mt-5"></div>
 
-    <div>
+    <div id="elction-card">
         <form class="flex" id="form" method="POST">
             <div class="col-6 c-none">
                 <header>
@@ -153,6 +165,73 @@
         </form>
     </div>
     <script src="/assets/js/hr-election.js"></script>
+    <script>
+        // ตั้งวันและเวลาเลือกตั้ง (ปี ค.ศ. เดือนเริ่มจาก 0)
+        const electionStart = new Date(2026, 9, 16, 8, 0, 0);
+        const electionEnd   = new Date(2026, 9, 16, 17, 0, 0);
+
+        function updateElectionStatus() {
+            const now = new Date();
+
+            const notOpen = document.getElementById("not-open");
+            const close = document.getElementById("close");
+            const card = document.getElementById("elction-card");
+
+            // ซ่อนทุกส่วนก่อน
+            notOpen.style.display = "none";
+            close.style.display = "none";
+            card.style.display = "none";
+
+            if (now < electionStart) {
+                // ก่อนถึงเวลาเปิดคูหา
+                notOpen.style.display = "block";
+
+            } else if (now <= electionEnd) {
+                // อยู่ในช่วงเวลาเลือกตั้ง
+                card.style.display = "block";
+
+            } else {
+                // หลังหมดเวลาเลือกตั้ง
+                close.style.display = "block";
+            }
+
+            // แสดงวันและเวลาปัจจุบันตามเวลาไทย
+            const dateOptions = {
+                timeZone: "Asia/Bangkok",
+                weekday: "long",
+                day: "numeric",
+                month: "long",
+                year: "numeric",
+                calendar: "buddhist"
+            };
+
+            const timeOptions = {
+                timeZone: "Asia/Bangkok",
+                hour: "2-digit",
+                minute: "2-digit",
+                second: "2-digit",
+                hour12: false
+            };
+
+            const dayText = "วัน" + new Intl.DateTimeFormat(
+                "th-TH", dateOptions
+            ).format(now);
+
+            const timeText = "เวลา " + new Intl.DateTimeFormat(
+                "th-TH", timeOptions
+            ).format(now) + " น.";
+
+            document.getElementById("day-not-open").textContent = dayText;
+            document.getElementById("time-not-open").textContent = timeText;
+
+            document.getElementById("day-close").textContent = dayText;
+            document.getElementById("time-close").textContent = timeText;
+        }
+
+        // ตรวจสอบสถานะทันที และตรวจซ้ำทุกวินาที
+        updateElectionStatus();
+        setInterval(updateElectionStatus, 1000);
+    </script>
     
 </body>
 </html>
