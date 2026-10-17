@@ -166,9 +166,10 @@
     </div>
     <script src="/assets/js/hr-election.js"></script>
     <script>
+        
         // ตั้งวันและเวลาเลือกตั้ง (ปี ค.ศ. เดือนเริ่มจาก 0)
-        const electionStart = new Date(2026, 9, 16, 8, 0, 0);
-        const electionEnd   = new Date(2026, 9, 16, 17, 0, 0);
+        const electionStart = new Date(2026, 9, 25, 8, 0, 0);
+        const electionEnd   = new Date(2026, 9, 25, 18, 0, 0);
 
         function updateElectionStatus() {
             const now = new Date();
@@ -231,6 +232,7 @@
         // ตรวจสอบสถานะทันที และตรวจซ้ำทุกวินาที
         updateElectionStatus();
         setInterval(updateElectionStatus, 1000);
+        
     </script>
     
 </body>
