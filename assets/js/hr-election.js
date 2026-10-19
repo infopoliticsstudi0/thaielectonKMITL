@@ -25,7 +25,7 @@ const CITIZEN_API =
     "https://script.google.com/macros/s/AKfycbz6FEDTpnZTwqCV2VpIKC3hIWKgvfxtM-BpySCXv1OYlfmZbISA9M6xcrDkXAjTaFJi2w/exec";
 
 const VOTE_API =
-    "https://script.google.com/macros/s/AKfycbxGmjaAwYhTDdl4MMoNrUsGKJQeK5K2dv_PJGmVjwZ3cd7VHu4dPuWOtkLE8ab_Rhed/exec";
+    "https://script.google.com/macros/s/AKfycbydOeEVNFmQw39wABY1HyAB5XaNQbGhkmntYQj4W-XJUIiqr_dk9LYpeIC69ZFqIbw/exec";
 
 
 // ------------------------------------------------------------
