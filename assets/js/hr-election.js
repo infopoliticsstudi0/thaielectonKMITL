@@ -190,15 +190,15 @@ if ($("form")) {
         }
 
         // Client-side duplicate check only
-        const submittedKey = "vote-submitted-" + citizen.id;
+        // const submittedKey = "vote-submitted-" + citizen.id;
 
-        if (localStorage.getItem(submittedKey) === "true") {
-            showStatus(
-                "เบราว์เซอร์นี้บันทึกสถานะว่าส่งบัตรแล้ว",
-                "error"
-            );
-            return;
-        }
+        // if (localStorage.getItem(submittedKey) === "true") {
+        //     showStatus(
+        //         "เบราว์เซอร์นี้บันทึกสถานะว่าส่งบัตรแล้ว",
+        //         "error"
+        //     );
+        //     return;
+        // }
 
         // Build payload
         const payload = {
@@ -308,7 +308,7 @@ if ($("form")) {
             }
 
             // Save local browser flag after server success
-            localStorage.setItem(submittedKey, "true");
+            // localStorage.setItem(submittedKey, "true");
 
             showStatus("ส่งข้อมูลสำเร็จ", "success");
 
