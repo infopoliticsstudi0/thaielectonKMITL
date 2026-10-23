@@ -1,0 +1,267 @@
+
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ระบบรายงานคะแนนเลือกตั้ง</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: system-ui, Tahoma, sans-serif;
+      background: #f3f5f9;
+      color: #182230;
+    }
+    header {
+      background: #142b4a;
+      color: white;
+      padding: 28px 18px;
+    }
+    .container { max-width: 900px; margin: auto; }
+    header h1 { margin: 0 0 8px; font-size: 25px; }
+    header p { margin: 0; color: #d3dfed; }
+    main { padding: 22px 16px; }
+    .toolbar, .panel, .candidate {
+      background: white;
+      border-radius: 12px;
+      padding: 16px;
+      border: 1px solid #e3e8ef;
+    }
+    .toolbar { margin-bottom: 16px; }
+    .tabs { display: flex; gap: 10px; margin-bottom: 14px; }
+    button, select, input {
+      font: inherit;
+      border-radius: 8px;
+      padding: 11px 14px;
+    }
+    button {
+      cursor: pointer;
+      border: 1px solid #d5dce6;
+      background: white;
+      color: #26364b;
+    }
+    button.active { background: #142b4a; color: white; }
+    #refresh { background: #e7eef8; }
+    input, select { border: 1px solid #d5dce6; }
+    input { width: 100%; }
+    .controls { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .panel { margin-bottom: 18px; }
+    .muted { color: #68778b; font-size: 14px; }
+    .leader-name { font-size: 20px; font-weight: 700; margin: 8px 0; }
+    .leader-score { font-size: 32px; font-weight: 800; color: #147d4a; }
+    .list { display: grid; gap: 12px; }
+    .candidate { padding: 15px; }
+    .candidate-top { display: flex; align-items: center; gap: 12px; }
+    .number {
+      width: 42px; height: 42px; flex-shrink: 0;
+      display: grid; place-items: center;
+      background: #edf1f7; border-radius: 10px;
+      font-weight: 800; font-size: 18px;
+    }
+    .candidate-info { flex: 1; min-width: 0; }
+    .candidate-name { font-weight: 650; overflow-wrap: anywhere; }
+    .score { font-weight: 750; font-size: 19px; margin-top: 5px; }
+    .bar { height: 7px; background: #e8edf3; border-radius: 8px; margin-top: 12px; overflow: hidden; }
+    .fill { height: 100%; background: #64748b; border-radius: 8px; }
+    .fill.leader { background: #16a34a; }
+    .rank { color: #147d4a; font-size: 12px; font-weight: 700; }
+    #status { padding: 10px 0; color: #68778b; font-size: 14px; }
+    footer { text-align: center; padding: 18px; color: #68778b; font-size: 12px; }
+    @media (max-width: 560px) {
+      header h1 { font-size: 21px; }
+      .controls { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container">
+      <h1>ระบบรายงานคะแนนเลือกตั้ง</h1>
+      <p>สมาชิกสภาผู้แทนราษฎรแบบแบ่งเขต</p>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="toolbar">
+      <div class="tabs">
+        <button class="active" data-zone="z1">เขต 1</button>
+        <button data-zone="z2">เขต 2</button>
+        <button id="refresh">รีเฟรชคะแนน</button>
+      </div>
+      <div class="controls">
+        <input id="search" type="search" placeholder="ค้นหาชื่อหรือหมายเลขผู้สมัคร">
+        <select id="sort">
+          <option value="score">เรียงคะแนนมากไปน้อย</option>
+          <option value="number">เรียงตามหมายเลขผู้สมัคร</option>
+        </select>
+      </div>
+      <div id="status" role="status" aria-live="polite">กำลังโหลดคะแนน...</div>
+    </section>
+
+    <section class="panel">
+      <div class="muted" id="zone-title">เขต 1</div>
+      <h2 style="margin:8px 0">ผู้นำคะแนน</h2>
+      <div class="leader-name" id="leader-name">กำลังโหลด...</div>
+      <div><span class="leader-score" id="leader-score">—</span> คะแนน</div>
+      <p class="muted" id="leader-note">ข้อมูลจากระบบคะแนน</p>
+    </section>
+
+    <h2 style="font-size:20px">คะแนนผู้สมัครทั้งหมด</h2>
+    <div id="candidate-list" class="list"></div>
+  </main>
+
+  <footer>
+    รายงานคะแนนจากระบบข้อมูลที่เชื่อมต่อ
+    <br>ผู้นำคะแนนไม่ใช่การรับรองผลเลือกตั้งอย่างเป็นทางการ
+  </footer>
+
+  <script>
+    const API_URL =
+      "https://script.google.com/macros/s/AKfycbzUkKOnJl98-1P7auMzqD-6_JlgkBAGJxWLUUTsc03htUux4T7RH96XlSFLoAcsK3JR2w/exec";
+
+    let electionData = {};
+    let currentZone = "z1";
+    let loading = false;
+
+    const $ = id => document.getElementById(id);
+
+    function escapeHTML(value) {
+      return String(value ?? "").replace(/[&<>"']/g, char => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;"
+      })[char]);
+    }
+
+    async function loadScores() {
+      if (loading) return;
+      loading = true;
+      $("refresh").disabled = true;
+      $("status").textContent = "กำลังโหลดข้อมูลคะแนน...";
+
+      try {
+        const response = await fetch(API_URL, { cache: "no-store" });
+        if (!response.ok) throw new Error("HTTP " + response.status);
+
+        const result = await response.json();
+        if (!result.success || !result.data) {
+          throw new Error("รูปแบบข้อมูล API ไม่ถูกต้อง");
+        }
+
+        for (const zone of ["z1", "z2"]) {
+          if (!Array.isArray(result.data[zone]?.candidates)) {
+            throw new Error("ไม่พบข้อมูลผู้สมัคร " + zone);
+          }
+        }
+
+        electionData = result.data;
+        render();
+        $("status").textContent =
+          "อัปเดตข้อมูลสำเร็จ เวลา " +
+          new Date().toLocaleTimeString("th-TH");
+      } catch (error) {
+        console.error("โหลดคะแนนไม่สำเร็จ:", error);
+        $("status").textContent =
+          "โหลดคะแนนไม่สำเร็จ: " + error.message +
+          " — ตรวจสอบ API และสิทธิ์การเข้าถึง";
+      } finally {
+        loading = false;
+        $("refresh").disabled = false;
+      }
+    }
+
+    function render() {
+      const zoneData = electionData[currentZone];
+      if (!zoneData) return;
+
+      const all = zoneData.candidates.map(c => ({
+        ...c,
+        totalScore: Number(c.totalScore) || 0
+      }));
+
+      const sorted = [...all].sort((a, b) =>
+        b.totalScore - a.totalScore ||
+        Number(a.number) - Number(b.number)
+      );
+
+      const leader = sorted[0];
+      $("zone-title").textContent =
+        currentZone === "z1" ? "เขตเลือกตั้งที่ 1" : "เขตเลือกตั้งที่ 2";
+
+      if (leader) {
+        $("leader-name").textContent = leader.name;
+        $("leader-score").textContent =
+          leader.totalScore.toLocaleString("th-TH");
+        $("leader-note").textContent =
+          "หมายเลข " + leader.number +
+          " · ผู้นำคะแนนในข้อมูลล่าสุด";
+      }
+
+      const keyword = $("search").value.trim().toLowerCase();
+      const mode = $("sort").value;
+
+      const candidates = all
+        .filter(c =>
+          c.name.toLowerCase().includes(keyword) ||
+          String(c.number).includes(keyword)
+        )
+        .sort(mode === "score"
+          ? (a, b) => b.totalScore - a.totalScore ||
+              Number(a.number) - Number(b.number)
+          : (a, b) => Number(a.number) - Number(b.number));
+
+      $("candidate-list").innerHTML = candidates.length
+        ? candidates.map(c => {
+            const isLeader = leader &&
+              c.totalScore === leader.totalScore &&
+              c.totalScore > 0;
+            const percent = leader && leader.totalScore > 0
+              ? Math.min(100, c.totalScore / leader.totalScore * 100)
+              : 0;
+
+            return `
+              <article class="candidate">
+                <div class="candidate-top">
+                  <div class="number">${escapeHTML(c.number)}</div>
+                  <div class="candidate-info">
+                    <div class="candidate-name">${escapeHTML(c.name)}</div>
+                    <div class="score">
+                      ${c.totalScore.toLocaleString("th-TH")}
+                      <span class="muted">คะแนน</span>
+                    </div>
+                  </div>
+                  ${isLeader ? '<span class="rank">คะแนนสูงสุด</span>' : ""}
+                </div>
+                <div class="bar">
+                  <div class="fill ${isLeader ? "leader" : ""}"
+                    style="width:${percent}%"></div>
+                </div>
+              </article>`;
+          }).join("")
+        : '<div class="panel">ไม่พบผู้สมัครที่ตรงกับคำค้นหา</div>';
+    }
+
+    document.querySelectorAll("[data-zone]").forEach(button => {
+      button.addEventListener("click", () => {
+        currentZone = button.dataset.zone;
+        document.querySelectorAll("[data-zone]").forEach(btn =>
+          btn.classList.toggle("active", btn === button)
+        );
+        render();
+      });
+    });
+
+    $("refresh").addEventListener("click", loadScores);
+    $("search").addEventListener("input", render);
+    $("sort").addEventListener("change", render);
+
+    loadScores();
+
+    // รีเฟรชคะแนนอัตโนมัติทุก 30 วินาที
+    setInterval(loadScores, 30000);
+  </script>
+</body>
+</html>
