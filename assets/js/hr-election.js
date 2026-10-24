@@ -190,16 +190,16 @@ if ($("form")) {
         }
 
         // ป้องกันชั้นที่ 1
-        Client-side duplicate check only
-        const submittedKey = "vote-submitted-" + citizen.id;
+        // Client-side duplicate check only
+        // const submittedKey = "vote-submitted-" + citizen.id;
 
-        if (localStorage.getItem(submittedKey) === "true") {
-            showStatus(
-                "เบราว์เซอร์นี้บันทึกสถานะว่าส่งบัตรแล้ว",
-                "error"
-            );
-            return;
-        }
+        // if (localStorage.getItem(submittedKey) === "true") {
+        //     showStatus(
+        //         "เบราว์เซอร์นี้บันทึกสถานะว่าส่งบัตรแล้ว",
+        //         "error"
+        //     );
+        //     return;
+        // }
 
         // Build payload
         const payload = {
