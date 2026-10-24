@@ -42,15 +42,16 @@
         #status-message.error { color: #b00020; }
         #status-message.success { font-family: 5em; color: #167a36; }
         #launch-screen {
-      min-height: 100vh;
-      min-height: 100dvh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      padding: 24px;
-      background: #f3f5f9;
-    }
+            min-height: calc(100vh - 49.2px);
+            min-height: calc(100vh - 49.2px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 24px;
+            background: #f3f5f9;
+            margin-top: 49.2px;
+        }
     
     .launch-card {
       width: 100%;
