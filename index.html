@@ -266,6 +266,34 @@
     checkLaunchTime();
     setInterval(checkLaunchTime, 1000);
 </script>
+    
+<script>
+(() => {
+    // ป้องกันเมนูคลิกขวา
+    document.addEventListener("contextmenu", function (event) {
+        event.preventDefault();
+    });
+
+    // ป้องกันคีย์ลัดสำหรับ Developer Tools และ View Source
+    document.addEventListener("keydown", function (event) {
+        const key = event.key.toLowerCase();
+
+        if (
+            key === "f12" ||
+            (event.ctrlKey && event.shiftKey &&
+                ["i", "j", "c"].includes(key)) ||
+            (event.ctrlKey && key === "u") ||
+            (event.metaKey && event.altKey &&
+                ["i", "j", "c"].includes(key))
+        ) {
+            event.preventDefault();
+            event.stopPropagation();
+            return false;
+        }
+    }, true);
+})();
+</script>
+
 
     
 </body>
