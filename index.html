@@ -268,31 +268,37 @@
 </script>
     
 <script>
-(() => {
-    // ป้องกันเมนูคลิกขวา
-    document.addEventListener("contextmenu", function (event) {
+document.addEventListener("keydown", function (event) {
+    const key = event.key.toLowerCase();
+
+    // ป้องกัน Ctrl, Alt และคีย์ลัด F12
+    if (
+        event.ctrlKey ||
+        event.altKey ||
+        key === "control" ||
+        key === "alt" ||
+        key === "f12"
+    ) {
         event.preventDefault();
-    });
+        event.stopPropagation();
+    }
+}, true);
 
-    // ป้องกันคีย์ลัดสำหรับ Developer Tools และ View Source
-    document.addEventListener("keydown", function (event) {
-        const key = event.key.toLowerCase();
+document.addEventListener("keyup", function (event) {
+    if (
+        ["control", "alt"].includes(event.key.toLowerCase())
+    ) {
+        event.preventDefault();
+        event.stopPropagation();
+    }
+}, true);
 
-        if (
-            key === "f12" ||
-            (event.ctrlKey && event.shiftKey &&
-                ["i", "j", "c"].includes(key)) ||
-            (event.ctrlKey && key === "u") ||
-            (event.metaKey && event.altKey &&
-                ["i", "j", "c"].includes(key))
-        ) {
-            event.preventDefault();
-            event.stopPropagation();
-            return false;
-        }
-    }, true);
-})();
+// ป้องกันคลิกขวา
+document.addEventListener("contextmenu", function (event) {
+    event.preventDefault();
+});
 </script>
+
 
 
     
