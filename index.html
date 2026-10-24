@@ -83,6 +83,11 @@
       min-height: 100vh;
       min-height: 100dvh;
     }
+        #launch-screen[hidden],
+#election-app[hidden],
+#report-app[hidden] {
+    display: none !important;
+}
 
     </style>
 </head>
@@ -216,62 +221,46 @@
     <script src="/assets/js/hr-election.js"></script>
     <script>
         
-        // เวลาเปิดระบบ: 25 ตุลาคม 2569 เวลา 08:00:00 น.
-        const LAUNCH_TIME = new Date(2026, 9, 25, 8, 0, 0).getTime();
-        
-        // เวลาปิดระบบ: 25 ตุลาคม 2569 เวลา 18:00:00 น.
-        // หมายถึงปิดหลังจากหมดเวลา 17:59 น.
-        const CLOSE_TIME = new Date(2026, 9, 25, 18, 0, 0).getTime();
-        
-        let adminUnlocked = false;
-        
-        function showReport() {
-            $("launch-screen").hidden = true;
-            $("election-app").hidden = false;
-        
-            // โหลดคะแนนเมื่อแสดงหน้ารายงานเท่านั้น
-            loadScores();
-        }
-        
         function checkLaunchTime() {
-            const now = Date.now();
-        
-            // ก่อนเวลาเปิดระบบ
-            if (now < LAUNCH_TIME && !adminUnlocked) {
-                $("launch-screen").hidden = false;
-                $("election").hidden = true;
-        
-                const remaining = LAUNCH_TIME - now;
-                const totalSeconds = Math.floor(remaining / 1000);
-        
-                const days = Math.floor(totalSeconds / 86400);
-                const hours = Math.floor((totalSeconds % 86400) / 3600);
-                const minutes = Math.floor((totalSeconds % 3600) / 60);
-                const seconds = totalSeconds % 60;
-        
-                $("launch-countdown").textContent =
-                    `เหลือเวลา ${days} วัน ${hours} ชม. ${minutes} นาที ${seconds} วินาที`;
-        
-                return;
-            }
-        
-            // หลังเวลาปิดระบบ
-            if (now >= CLOSE_TIME && !adminUnlocked) {
-                $("launch-screen").hidden = false;
-                $("election").hidden = true;
-        
-                $("launch-countdown").textContent = "ระบบปิดให้บริการแล้ว";
-                return;
-            }
-        
-            // ระหว่างเวลาเปิดระบบ 08:00–17:59 น.
-            $("launch-screen").hidden = true;
-            showReport();
+        const now = Date.now();
+    
+        // ก่อน 08:00 น.
+        if (now < LAUNCH_TIME && !adminUnlocked) {
+            $("launch-screen").hidden = false;
+            $("election-app").hidden = true;
+            $("report-app").hidden = true;
+    
+            const remaining = LAUNCH_TIME - now;
+            const totalSeconds = Math.floor(remaining / 1000);
+    
+            const days = Math.floor(totalSeconds / 86400);
+            const hours = Math.floor((totalSeconds % 86400) / 3600);
+            const minutes = Math.floor((totalSeconds % 3600) / 60);
+            const seconds = totalSeconds % 60;
+    
+            $("launch-countdown").textContent =
+                `เหลือเวลา ${days} วัน ${hours} ชม. ${minutes} นาที ${seconds} วินาที`;
+    
+            return;
         }
-        
-        // ตรวจสอบสถานะทันที และอัปเดตทุกวินาที
-        checkLaunchTime();
-        setInterval(checkLaunchTime, 1000);
+    
+        // ตั้งแต่ 18:00 น. เป็นต้นไป
+        if (now >= CLOSE_TIME && !adminUnlocked) {
+            $("launch-screen").hidden = false;
+            $("election-app").hidden = true;
+            $("report-app").hidden = true;
+    
+            $("launch-countdown").textContent = "ระบบปิดให้บริการแล้ว";
+            return;
+        }
+    
+        // ช่วงเปิดระบบ 08:00–17:59 น.
+        $("launch-screen").hidden = true;
+        $("election-app").hidden = true;
+        $("report-app").hidden = false;
+    
+        loadScores();
+    }
         
     </script>
     
