@@ -95,6 +95,34 @@
                         <h3 style="color: #b00020;">**เตือน : ระบบตรวจสอบทันทีว่ามีการทุจริตเลือกตั้ง มีระบบ Check IP**</h3>
                     </div>
                 </main>
+                
+                <main>
+                    <h3>ยืนยันตัวตนชั้นที่ 2</h3>
+                    <p>ทำภารกิจให้สำเร็จเพื่อดำเนินการต่อ</p>
+                
+                    <div id="verify-task">
+                        <p id="verify-instruction">
+                            กดปุ่มเริ่มภารกิจเพื่อยืนยันตัวตน
+                        </p>
+                
+                        <button type="button" id="verify-start">
+                            เริ่มภารกิจ
+                        </button>
+                
+                        <div id="verify-game" hidden>
+                            <p id="verify-countdown">เหลือเวลา 5 วินาที</p>
+                            <p id="verify-question"></p>
+                            <div id="verify-buttons"></div>
+                        </div>
+                
+                        <p id="verify-result" role="status" aria-live="polite"></p>
+                    </div>
+                
+                    <input type="hidden" id="identity-verified" value="">
+                
+                    <div id="status-message" style="display:none;"></div>
+                </main>
+
             </div>
 
             <div class="col-6 c-6">
@@ -171,75 +199,136 @@
         </form>
     </div>
     <script src="/assets/js/hr-election.js"></script>
-    <!-- <script>
+    <script>
+                
+        (() => {
+            const startButton = document.getElementById("verify-start");
+            const game = document.getElementById("verify-game");
+            const question = document.getElementById("verify-question");
+            const buttons = document.getElementById("verify-buttons");
+            const countdown = document.getElementById("verify-countdown");
+            const result = document.getElementById("verify-result");
+            const verifiedInput = document.getElementById("identity-verified");
         
-        // ตั้งวันและเวลาเลือกตั้ง (ปี ค.ศ. เดือนเริ่มจาก 0)
-        const electionStart = new Date(2026, 9, 25, 8, 0, 0);
-        const electionEnd   = new Date(2026, 9, 25, 18, 0, 0);
-
-        function updateElectionStatus() {
-            const now = new Date();
-
-            const notOpen = document.getElementById("not-open");
-            const close = document.getElementById("close");
-            const card = document.getElementById("elction-card");
-
-            // ซ่อนทุกส่วนก่อน
-            notOpen.style.display = "none";
-            close.style.display = "none";
-            card.style.display = "none";
-
-            if (now < electionStart) {
-                // ก่อนถึงเวลาเปิดคูหา
-                notOpen.style.display = "flex";
-
-            } else if (now <= electionEnd) {
-                // อยู่ในช่วงเวลาเลือกตั้ง
-                card.style.display = "block";
-
-            } else {
-                // หลังหมดเวลาเลือกตั้ง
-                close.style.display = "flex";
+            if (!startButton || !game || !question || !buttons) return;
+        
+            let target = 0;
+            let progress = 0;
+            let deadline = 0;
+            let timer = null;
+            let active = false;
+        
+            function resetVerification() {
+                active = false;
+                clearInterval(timer);
+                verifiedInput.value = "";
+                game.hidden = true;
+                startButton.disabled = false;
             }
+        
+            function finish(success) {
+                if (!active) return;
+        
+                active = false;
+                clearInterval(timer);
+                game.hidden = true;
+                startButton.disabled = false;
+        
+                if (success) {
+                    verifiedInput.value = "verified";
+                    result.textContent = "ยืนยันสำเร็จ สามารถดำเนินการต่อได้";
+                    result.style.color = "green";
+                } else {
+                    verifiedInput.value = "";
+                    result.textContent = "หมดเวลา กรุณาเริ่มภารกิจใหม่";
+                    result.style.color = "#b00020";
+                }
+        
+                // แจ้งให้ระบบอื่นทราบว่าสถานะการยืนยันเปลี่ยนแล้ว
+                document.dispatchEvent(new CustomEvent("identityVerificationChanged", {
+                    detail: { verified: success }
+                }));
+            }
+        
+            function updateCountdown() {
+                const remaining = Math.max(0, deadline - Date.now());
+                countdown.textContent =
+                    `เหลือเวลา ${(remaining / 1000).toFixed(1)} วินาที`;
+        
+                if (remaining <= 0) finish(false);
+            }
+        
+            startButton.addEventListener("click", () => {
+                resetVerification();
+        
+                progress = 0;
+                target = Math.floor(Math.random() * 5) + 1;
+                deadline = Date.now() + 5000;
+                active = true;
+        
+                result.textContent = "";
+                question.textContent =
+                    `ภารกิจ: กดเลข ${target} ให้ถูกต้อง 3 ครั้ง`;
+                buttons.replaceChildren();
+        
+                for (let n = 1; n <= 5; n++) {
+                    const button = document.createElement("button");
+                    button.type = "button";
+                    button.textContent = n;
+                    button.style.margin = "4px";
+                    button.style.padding = "10px 16px";
+        
+                    button.addEventListener("click", () => {
+                        if (!active || Date.now() >= deadline) {
+                            finish(false);
+                            return;
+                        }
+        
+                        if (n !== target) {
+                            finish(false);
+                            return;
+                        }
+        
+                        progress++;
+        
+                        if (progress >= 3) {
+                            finish(true);
+                        } else {
+                            question.textContent =
+                                `ถูกต้อง ${progress}/3 ครั้ง กดเลข ${target} อีกครั้ง`;
+                        }
+                    });
+        
+                    buttons.appendChild(button);
+                }
+        
+                game.hidden = false;
+                startButton.disabled = true;
+                updateCountdown();
+                timer = setInterval(updateCountdown, 100);
+            });
+        
+            // เมื่อเริ่มใหม่หรือโหลดหน้า สถานะต้องยังไม่ผ่าน
+            resetVerification();
+        })();
 
-            // แสดงวันและเวลาปัจจุบันตามเวลาไทย
-            const dateOptions = {
-                timeZone: "Asia/Bangkok",
-                weekday: "long",
-                day: "numeric",
-                month: "long",
-                year: "numeric",
-                calendar: "buddhist"
-            };
-
-            const timeOptions = {
-                timeZone: "Asia/Bangkok",
-                hour: "2-digit",
-                minute: "2-digit",
-                second: "2-digit",
-                hour12: false
-            };
-
-            const dayText = "วัน" + new Intl.DateTimeFormat(
-                "th-TH", dateOptions
-            ).format(now);
-
-            const timeText = "เวลา " + new Intl.DateTimeFormat(
-                "th-TH", timeOptions
-            ).format(now) + " น.";
-
-            document.getElementById("day-not-open").textContent = dayText;
-            document.getElementById("time-not-open").textContent = timeText;
-
-            document.getElementById("day-close").textContent = dayText;
-            document.getElementById("time-close").textContent = timeText;
+        
+        const electionForm = document.getElementById("land-registration-form");
+        
+        if (electionForm) {
+            electionForm.addEventListener("submit", function (event) {
+                const verified =
+                    document.getElementById("identity-verified")?.value === "verified";
+        
+                if (!verified) {
+                    event.preventDefault();
+                    alert("กรุณาทำภารกิจยืนยันตัวตนชั้นที่ 2 ให้สำเร็จก่อนส่งข้อมูล");
+                }
+            });
         }
 
-        // ตรวจสอบสถานะทันที และตรวจซ้ำทุกวินาที
-        updateElectionStatus();
-        setInterval(updateElectionStatus, 1000);
-        
-    </script> -->
+
+    </script>
     
 </body>
 </html> 
