@@ -189,6 +189,7 @@ if ($("form")) {
             return;
         }
 
+        // ป้องกันชั้นที่ 1
         Client-side duplicate check only
         const submittedKey = "vote-submitted-" + citizen.id;
 
