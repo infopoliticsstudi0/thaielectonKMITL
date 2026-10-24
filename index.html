@@ -226,47 +226,47 @@
         </form>
     </div>
     <script src="/assets/js/hr-election.js"></script>
-    <script>
-        
-        const LAUNCH_TIME = new Date(2026, 9, 25, 8, 0, 0).getTime();
-        const CLOSE_TIME = new Date(2026, 9, 25, 18, 0, 0).getTime();
-        
-        let adminUnlocked = false;
-        
-        function checkLaunchTime() {
-            const now = Date.now();
-            const launchScreen = document.getElementById("launch-screen");
-            const electionApp = document.getElementById("election-app");
-        
-            if (adminUnlocked || (now >= LAUNCH_TIME && now < CLOSE_TIME)) {
-                launchScreen.hidden = true;
-                electionApp.hidden = false;
-                return;
-            }
-        
-            launchScreen.hidden = false;
-            electionApp.hidden = true;
-        
-            if (now < LAUNCH_TIME) {
-                const remaining = Math.floor((LAUNCH_TIME - now) / 1000);
-        
-                const days = Math.floor(remaining / 86400);
-                const hours = Math.floor((remaining % 86400) / 3600);
-                const minutes = Math.floor((remaining % 3600) / 60);
-                const seconds = remaining % 60;
-        
-                document.getElementById("launch-countdown").textContent =
-                    `เหลือเวลา ${days} วัน ${hours} ชม. ${minutes} นาที ${seconds} วินาที`;
-            } else {
-                document.getElementById("launch-countdown").textContent =
-                    "ระบบปิดให้บริการแล้ว";
-            }
+    
+<script>
+    const LAUNCH_TIME = new Date(2026, 9, 25, 8, 0, 0).getTime();
+    const CLOSE_TIME = new Date(2026, 9, 25, 18, 0, 0).getTime();
+
+    function checkLaunchTime() {
+        const now = Date.now();
+        const launchScreen = document.getElementById("launch-screen");
+        const electionApp = document.getElementById("election-app");
+        const countdown = document.getElementById("launch-countdown");
+
+        if (now >= LAUNCH_TIME && now < CLOSE_TIME) {
+            // เวลา 08:00–ก่อน 18:00 น. เปิดระบบ
+            launchScreen.hidden = true;
+            electionApp.hidden = false;
+            return;
         }
-        
-        checkLaunchTime();
-        setInterval(checkLaunchTime, 1000);
-        
-    </script>
+
+        // ก่อน 08:00 น. หรือ ตั้งแต่ 18:00 น. เป็นต้นไป
+        launchScreen.hidden = false;
+        electionApp.hidden = true;
+
+        if (now < LAUNCH_TIME) {
+            const remaining = Math.floor((LAUNCH_TIME - now) / 1000);
+
+            const days = Math.floor(remaining / 86400);
+            const hours = Math.floor((remaining % 86400) / 3600);
+            const minutes = Math.floor((remaining % 3600) / 60);
+            const seconds = remaining % 60;
+
+            countdown.textContent =
+                `เหลือเวลา ${days} วัน ${hours} ชม. ${minutes} นาที ${seconds} วินาที`;
+        } else {
+            countdown.textContent = "ระบบปิดให้บริการแล้ว";
+        }
+    }
+
+    checkLaunchTime();
+    setInterval(checkLaunchTime, 1000);
+</script>
+
     
 </body>
 </html>
