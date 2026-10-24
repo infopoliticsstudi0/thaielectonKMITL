@@ -73,49 +73,121 @@
       header h1 { font-size: 21px; }
       .controls { grid-template-columns: 1fr; }
     }
+    
+    #launch-screen {
+      min-height: 100vh;
+      min-height: 100dvh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 24px;
+      background: #f3f5f9;
+    }
+    
+    .launch-card {
+      width: 100%;
+      max-width: 560px;
+      padding: 40px 24px;
+      background: #fff;
+      border: 1px solid #e3e8ef;
+      border-radius: 20px;
+      box-shadow: 0 10px 35px rgba(0, 0, 0, 0.06);
+    }
+    
+    .launch-card h1 {
+      color: #15803d;
+      font-size: clamp(24px, 5vw, 34px);
+      margin: 0 0 16px;
+    }
+    
+    .launch-card p {
+      color: #68778b;
+      line-height: 1.8;
+    }
+    
+    #launch-countdown {
+      font-size: clamp(25px, 6vw, 38px);
+      font-weight: 800;
+      color: #16a34a;
+      margin-top: 20px;
+    }
+    #report-app {
+      min-height: 100vh;
+      min-height: 100dvh;
+    }
+    
+    #report-app header {
+      padding: 24px 18px;
+    }
+    
+    #report-app main {
+      padding-bottom: 30px;
+    }
+    
+    #report-app footer {
+      padding-bottom: 20px;
+    }
+
   </style>
 </head>
 <body>
-  <header>
-    <div class="container">
+  
+  <!-- แสดงก่อนถึงเวลาเปิด -->
+  <section id="launch-screen">
+    <div class="launch-card">
       <h1>ระบบรายงานคะแนนเลือกตั้ง</h1>
-      <p>สมาชิกสภาผู้แทนราษฎรแบบแบ่งเขต</p>
+      <p>ระบบจะเปิดให้เข้าชมอย่างเป็นทางการ</p>
+      <p><strong>25 ตุลาคม 2569 เวลา 18:00 น.</strong></p>
+      <div id="launch-countdown">กำลังตรวจสอบเวลา...</div>
     </div>
-  </header>
+  </section>
 
-  <main class="container">
-    <section class="toolbar">
-      <div class="tabs">
-        <button class="active" data-zone="z1">เขต 1</button>
-        <button data-zone="z2">เขต 2</button>
-        <button id="refresh">รีเฟรชคะแนน</button>
-      </div>
-      <div class="controls">
-        <input id="search" type="search" placeholder="ค้นหาชื่อหรือหมายเลขผู้สมัคร">
-        <select id="sort">
-          <option value="score">เรียงคะแนนมากไปน้อย</option>
-          <option value="number">เรียงตามหมายเลขผู้สมัคร</option>
-        </select>
-      </div>
-      <div id="status" role="status" aria-live="polite">กำลังโหลดคะแนน...</div>
-    </section>
+  <!-- หน้าเว็บรายงานคะแนน -->
+  <div id="report-app" hidden>
+    
+      <header>
+        <div class="container">
+          <h1>ระบบรายงานคะแนนเลือกตั้ง</h1>
+          <p>สมาชิกสภาผู้แทนราษฎรแบบแบ่งเขต</p>
+        </div>
+      </header>
+    
+      <main class="container">
+        <section class="toolbar">
+          <div class="tabs">
+            <button class="active" data-zone="z1">เขต 1</button>
+            <button data-zone="z2">เขต 2</button>
+            <button id="refresh">รีเฟรชคะแนน</button>
+          </div>
+          <div class="controls">
+            <input id="search" type="search" placeholder="ค้นหาชื่อหรือหมายเลขผู้สมัคร">
+            <select id="sort">
+              <option value="score">เรียงคะแนนมากไปน้อย</option>
+              <option value="number">เรียงตามหมายเลขผู้สมัคร</option>
+            </select>
+          </div>
+          <div id="status" role="status" aria-live="polite">กำลังโหลดคะแนน...</div>
+        </section>
+    
+        <section class="panel">
+          <div class="muted" id="zone-title">เขต 1</div>
+          <h2 style="margin:8px 0">ผู้นำคะแนน</h2>
+          <div class="leader-name" id="leader-name">กำลังโหลด...</div>
+          <div><span class="leader-score" id="leader-score">—</span> คะแนน</div>
+          <p class="muted" id="leader-note">ข้อมูลจากระบบคะแนน</p>
+        </section>
+    
+        <h2 style="font-size:20px">คะแนนผู้สมัครทั้งหมด</h2>
+        <div id="candidate-list" class="list"></div>
+      </main>
+    
+      <footer>
+        รายงานคะแนนจากระบบข้อมูลที่เชื่อมต่อ
+        <br>ผู้นำคะแนนไม่ใช่การรับรองผลเลือกตั้งอย่างเป็นทางการ
+      </footer>
 
-    <section class="panel">
-      <div class="muted" id="zone-title">เขต 1</div>
-      <h2 style="margin:8px 0">ผู้นำคะแนน</h2>
-      <div class="leader-name" id="leader-name">กำลังโหลด...</div>
-      <div><span class="leader-score" id="leader-score">—</span> คะแนน</div>
-      <p class="muted" id="leader-note">ข้อมูลจากระบบคะแนน</p>
-    </section>
-
-    <h2 style="font-size:20px">คะแนนผู้สมัครทั้งหมด</h2>
-    <div id="candidate-list" class="list"></div>
-  </main>
-
-  <footer>
-    รายงานคะแนนจากระบบข้อมูลที่เชื่อมต่อ
-    <br>ผู้นำคะแนนไม่ใช่การรับรองผลเลือกตั้งอย่างเป็นทางการ
-  </footer>
+  </div>
 
   <script>
     const API_URL =
@@ -263,6 +335,67 @@
 
     // รีเฟรชคะแนนอัตโนมัติทุก 30 วินาที
     setInterval(loadScores, 30000);
+
+    
+    const LAUNCH_TIME = new Date(2026, 9, 25, 18, 0, 0).getTime();
+    // เดือนเริ่มจาก 0: 9 คือเดือนตุลาคม
+    
+    let adminUnlocked = false;
+    
+    function showReport() {
+      $("launch-screen").hidden = true;
+      $("report-app").hidden = false;
+    
+      // โหลดคะแนนเมื่อแสดงหน้ารายงานเท่านั้น
+      loadScores();
+    }
+    
+    function checkLaunchTime() {
+      const now = Date.now();
+      const remaining = LAUNCH_TIME - now;
+    
+      if (adminUnlocked || remaining <= 0) {
+        $("launch-countdown").textContent = "ระบบเปิดให้บริการแล้ว";
+        showReport();
+        return;
+      }
+    
+      $("launch-screen").hidden = false;
+      $("report-app").hidden = true;
+    
+      const totalSeconds = Math.floor(remaining / 1000);
+      const days = Math.floor(totalSeconds / 86400);
+      const hours = Math.floor((totalSeconds % 86400) / 3600);
+      const minutes = Math.floor((totalSeconds % 3600) / 60);
+      const seconds = totalSeconds % 60;
+    
+      $("launch-countdown").textContent =
+        `${days} วัน ${hours} ชม. ${minutes} นาที ${seconds} วินาที`;
+    }
+    
+    // เปิด Console แล้วพิมพ์ 1234 เพื่อปลดล็อก
+    // ใช้ช่องกรอกรหัสผ่านแทนการเปิดเผยรหัสไว้ในโค้ดจะปลอดภัยกว่า
+    window.addEventListener("keydown", function (event) {
+      // ไม่ใช้ปุ่มลัดนี้เป็นระบบรักษาความปลอดภัย
+    });
+    
+    checkLaunchTime();
+    setInterval(checkLaunchTime, 1000);
+
+    
+    window.unlockAdmin = function (code) {
+      if (String(code) !== "1234") {
+        console.warn("รหัสแอดมินไม่ถูกต้อง");
+        return false;
+      }
+    
+      adminUnlocked = true;
+      showReport();
+    
+      console.info("ปลดล็อกหน้าแสดงคะแนนแล้ว");
+      return true;
+    };
+
   </script>
 </body>
 </html>
